@@ -7,7 +7,7 @@ final class TranscriptHistoryScreenInitial extends TranscriptHistoryScreenState 
 final class TranscriptHistoryScreenLoading extends TranscriptHistoryScreenState {}
 
 final class TranscriptHistoryScreenLoaded extends TranscriptHistoryScreenState {
-  final List<Map<String, dynamic>> history;
+  final List<TranscriptEntity> history;
   TranscriptHistoryScreenLoaded({required this.history});
 }
 

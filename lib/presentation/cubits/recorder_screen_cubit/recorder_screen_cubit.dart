@@ -5,20 +5,20 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:tts_sarvam_test_app/core/network/socket_client.dart';
-import 'package:tts_sarvam_test_app/core/storage/hive_service.dart';
+import 'package:tts_sarvam_test_app/domain/usecase/save_transcription_usecase.dart';
 
 part 'recorder_screen_state.dart';
 
 class RecorderScreenCubit extends Cubit<RecorderScreenState> {
   final SocketClient? socketClient;
-  final HiveService hiveService;
+  final SaveTranscriptionUseCase saveTranscriptionUseCase;
   final AudioRecorder _audioRecorder = AudioRecorder();
   StreamSubscription<SpeechToTextResponse>? _socketSubscription;
   StreamSubscription<List<int>>? _audioSubscription;
   Timer? _visualizerTimer;
   final Random _random = Random();
 
-  RecorderScreenCubit({this.socketClient, required this.hiveService})
+  RecorderScreenCubit({this.socketClient, required this.saveTranscriptionUseCase})
       : super(RecorderScreenInitial());
 
   void toggleRecording({String languageCode = 'en-IN'}) {
@@ -29,24 +29,21 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     }
   }
 
-  /// Save current transcription history to Hive and reset screen state
   Future<void> saveTranscriptionHistory() async {
     final list = state.transcripts;
     if (list.isNotEmpty) {
-      await hiveService.saveTranscription(list);
+      await saveTranscriptionUseCase(list);
     }
     await stopRecording(hasHistory: false);
     emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
   }
 
-  /// Discard current transcription and reset screen state
   Future<void> discardRecording() async {
     await stopRecording(hasHistory: false);
     emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
   }
 
   Future<void> startRecording({String languageCode = 'en-IN'}) async {
-    // 1. Check microphone permission using permission_handler
     final status = await Permission.microphone.request();
     if (!status.isGranted) {
       debugPrint('[RecorderScreenCubit] Microphone permission denied.');
@@ -60,7 +57,6 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     _audioSubscription?.cancel();
     _socketSubscription?.cancel();
 
-    // 2. Connect to the socket client if available
     final client = socketClient;
     if (client != null) {
       try {
@@ -88,7 +84,6 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
         );
       } catch (e) {
         debugPrint('[RecorderScreenCubit] Socket connection failed: $e');
-        // Halt recording flow since the socket could not be established
         emit(RecorderScreenStopped(
           transcripts: state.transcripts,
         ));
@@ -96,7 +91,6 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
       }
     }
 
-    // 3. Start recording audio and streaming it to the socket
     try {
       final hasPermission = await _audioRecorder.hasPermission();
       if (hasPermission) {
@@ -119,7 +113,6 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
       debugPrint('[RecorderScreenCubit] Error starting audio stream: $e');
     }
 
-    // 4. Start visualizer timer for UI heights
     _visualizerTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       final newBarHeights = List.generate(
         30,

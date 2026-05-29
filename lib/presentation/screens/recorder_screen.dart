@@ -26,7 +26,6 @@ class RecordingScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: 16),
 
-                    // 1. Audio Wave (Visualizer)
                     AudioWaveWidget(
                       barHeights: barHeights,
                       isRecording: isRecording,
@@ -34,7 +33,6 @@ class RecordingScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 2. Transcription Widget
                     Expanded(
                       child: Container(
                         width: double.infinity,
@@ -62,7 +60,6 @@ class RecordingScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // 3. Audio Control Widget
                     AudioControlWidget(
                       isRecording: isRecording,
                       hasHistory: state.transcripts.isNotEmpty,
@@ -89,7 +86,6 @@ class RecordingScreen extends StatelessWidget {
   }
 }
 
-/// 1. Audio Wave Widget (Visualizer)
 class AudioWaveWidget extends StatelessWidget {
   final List<double> barHeights;
   final bool isRecording;
@@ -128,7 +124,6 @@ class AudioWaveWidget extends StatelessWidget {
   }
 }
 
-/// 2. Segregated Transcription Widget
 class TranscriptionWidget extends StatelessWidget {
   final List<String> transcripts;
   final bool isRecording;
@@ -221,7 +216,6 @@ class TranscriptionWidget extends StatelessWidget {
   }
 }
 
-/// 3. Audio Control Widget
 class AudioControlWidget extends StatelessWidget {
   final bool isRecording;
   final bool hasHistory;

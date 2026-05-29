@@ -1,32 +1,54 @@
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tts_sarvam_test_app/core/network/socket_client.dart';
-import 'package:tts_sarvam_test_app/core/storage/hive_service.dart';
+import 'package:tts_sarvam_test_app/data/datasources/transcription_local_datasource.dart';
+import 'package:tts_sarvam_test_app/data/models/transcript_model.dart';
+import 'package:tts_sarvam_test_app/data/repo_impl/transcription_repository_impl.dart';
+import 'package:tts_sarvam_test_app/domain/repository/transcription_repository.dart';
+import 'package:tts_sarvam_test_app/domain/usecase/save_transcription_usecase.dart';
+import 'package:tts_sarvam_test_app/domain/usecase/transcription_history_usecase.dart';
 import 'package:tts_sarvam_test_app/presentation/cubits/recorder_screen_cubit/recorder_screen_cubit.dart';
 import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
-  // Storage Layer Registration & Initialization
-  final hiveService = HiveService();
-  await hiveService.init();
-  sl.registerSingleton<HiveService>(hiveService);
+  await Hive.initFlutter();
+  Hive.registerAdapter(TranscriptModelAdapter());
 
-  // Network Client Registration
+  final Box<TranscriptModel> transcriptionBox =
+      await Hive.openBox<TranscriptModel>('transcription_history_v2');
+  sl.registerSingleton<Box<TranscriptModel>>(transcriptionBox);
+
+  sl.registerSingleton<TranscriptionLocalDataSource>(
+    TranscriptionLocalDataSourceImpl(box: sl<Box<TranscriptModel>>()),
+  );
+
+  sl.registerSingleton<TranscriptionRepository>(
+    TranscriptionRepositoryImpl(localDataSource: sl<TranscriptionLocalDataSource>()),
+  );
+
+  sl.registerLazySingleton<SaveTranscriptionUseCase>(
+    () => SaveTranscriptionUseCase(sl<TranscriptionRepository>()),
+  );
+  sl.registerLazySingleton<TranscriptionHistoryUseCase>(
+    () => TranscriptionHistoryUseCase(sl<TranscriptionRepository>()),
+  );
+
   sl.registerLazySingleton<SocketClient>(
     () => SocketClient("sk_y7ow09yd_lQsMm0ZrGD4lqpUdN5bRcV5o"),
   );
 
-  // Cubit / State Management Registration
-  // Factory registration ensures fresh state is instantiated when requested or rebuilt
   sl.registerFactory<RecorderScreenCubit>(
     () => RecorderScreenCubit(
       socketClient: sl<SocketClient>(),
-      hiveService: sl<HiveService>(),
+      saveTranscriptionUseCase: sl<SaveTranscriptionUseCase>(),
     ),
   );
 
   sl.registerFactory<TranscriptHistoryScreenCubit>(
-    () => TranscriptHistoryScreenCubit(hiveService: sl<HiveService>()),
+    () => TranscriptHistoryScreenCubit(
+      transcriptionHistoryUseCase: sl<TranscriptionHistoryUseCase>(),
+    ),
   );
 }

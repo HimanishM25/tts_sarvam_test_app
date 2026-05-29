@@ -7,11 +7,7 @@ import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_scree
 class TranscriptionHistoryScreen extends StatelessWidget {
   const TranscriptionHistoryScreen({super.key});
 
-  String _formatDateTime(String? isoString) {
-    if (isoString == null) return '';
-    final dateTime = DateTime.tryParse(isoString);
-    if (dateTime == null) return '';
-
+  String _formatDateTime(DateTime dateTime) {
     final months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -149,9 +145,9 @@ class TranscriptionHistoryScreen extends StatelessWidget {
                     itemCount: history.length,
                     itemBuilder: (context, index) {
                       final item = history[index];
-                      final String id = item['id'] ?? '';
-                      final String timestampStr = item['timestamp'];
-                      final List<String> transcripts = List<String>.from(item['transcripts'] ?? []);
+                      final String id = item.id;
+                      final DateTime timestamp = item.timestamp;
+                      final List<String> transcripts = item.transcripts;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16.0),
@@ -174,7 +170,6 @@ class TranscriptionHistoryScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Card Header
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -187,7 +182,7 @@ class TranscriptionHistoryScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        _formatDateTime(timestampStr),
+                                        _formatDateTime(timestamp),
                                         style: const TextStyle(
                                           color: AppColors.textGrey,
                                           fontSize: 12,
@@ -210,7 +205,6 @@ class TranscriptionHistoryScreen extends StatelessWidget {
                               const Divider(color: AppColors.lightGrey, height: 1),
                               const SizedBox(height: 12),
 
-                              // Transcripts content
                               ...transcripts.map((text) {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
