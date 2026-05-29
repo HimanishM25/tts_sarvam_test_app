@@ -5,18 +5,21 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:tts_sarvam_test_app/core/network/socket_client.dart';
+import 'package:tts_sarvam_test_app/core/storage/hive_service.dart';
 
 part 'recorder_screen_state.dart';
 
 class RecorderScreenCubit extends Cubit<RecorderScreenState> {
   final SocketClient? socketClient;
+  final HiveService hiveService;
   final AudioRecorder _audioRecorder = AudioRecorder();
   StreamSubscription<SpeechToTextResponse>? _socketSubscription;
   StreamSubscription<List<int>>? _audioSubscription;
   Timer? _visualizerTimer;
   final Random _random = Random();
 
-  RecorderScreenCubit({this.socketClient}) : super(RecorderScreenInitial());
+  RecorderScreenCubit({this.socketClient, required this.hiveService})
+      : super(RecorderScreenInitial());
 
   void toggleRecording({String languageCode = 'en-IN'}) {
     if (state.isRecording) {
@@ -24,6 +27,22 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     } else {
       startRecording(languageCode: languageCode);
     }
+  }
+
+  /// Save current transcription history to Hive and reset screen state
+  Future<void> saveTranscriptionHistory() async {
+    final list = state.transcripts;
+    if (list.isNotEmpty) {
+      await hiveService.saveTranscription(list);
+    }
+    await stopRecording(hasHistory: false);
+    emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
+  }
+
+  /// Discard current transcription and reset screen state
+  Future<void> discardRecording() async {
+    await stopRecording(hasHistory: false);
+    emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
   }
 
   Future<void> startRecording({String languageCode = 'en-IN'}) async {

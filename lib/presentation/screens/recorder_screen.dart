@@ -65,12 +65,15 @@ class RecordingScreen extends StatelessWidget {
                     // 3. Audio Control Widget
                     AudioControlWidget(
                       isRecording: isRecording,
-                      hasHistory: state is RecorderScreenStopped && state.hasHistory,
+                      hasHistory: state.transcripts.isNotEmpty,
                       onToggle: () {
                         context.read<RecorderScreenCubit>().toggleRecording();
                       },
                       onStop: () {
-                        context.read<RecorderScreenCubit>().stopRecording();
+                        context.read<RecorderScreenCubit>().discardRecording();
+                      },
+                      onSave: () {
+                        context.read<RecorderScreenCubit>().saveTranscriptionHistory();
                       },
                     ),
 
@@ -224,6 +227,7 @@ class AudioControlWidget extends StatelessWidget {
   final bool hasHistory;
   final VoidCallback onToggle;
   final VoidCallback onStop;
+  final VoidCallback onSave;
 
   const AudioControlWidget({
     super.key,
@@ -231,6 +235,7 @@ class AudioControlWidget extends StatelessWidget {
     required this.hasHistory,
     required this.onToggle,
     required this.onStop,
+    required this.onSave,
   });
 
   @override
@@ -286,7 +291,7 @@ class AudioControlWidget extends StatelessWidget {
             const SizedBox(width: 20),
             IconButton(
               icon: const Icon(Icons.check, color: AppColors.primary),
-              onPressed: onStop,
+              onPressed: onSave,
             ),
           ],
         ],
