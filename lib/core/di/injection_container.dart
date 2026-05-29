@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:tts_sarvam_test_app/core/network/socket_client.dart';
 import 'package:tts_sarvam_test_app/core/storage/hive_service.dart';
 import 'package:tts_sarvam_test_app/presentation/cubits/recorder_screen_cubit/recorder_screen_cubit.dart';
+import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -23,5 +24,9 @@ Future<void> init() async {
       socketClient: sl<SocketClient>(),
       hiveService: sl<HiveService>(),
     ),
+  );
+
+  sl.registerFactory<TranscriptHistoryScreenCubit>(
+    () => TranscriptHistoryScreenCubit(hiveService: sl<HiveService>()),
   );
 }
