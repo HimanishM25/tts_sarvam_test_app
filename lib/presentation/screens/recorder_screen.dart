@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tts_sarvam_test_app/core/constants/app_colors.dart';
 import 'package:tts_sarvam_test_app/core/di/injection_container.dart';
+import 'package:tts_sarvam_test_app/core/constants/app_strings.dart';
 import 'package:tts_sarvam_test_app/presentation/cubits/recorder_screen_cubit/recorder_screen_cubit.dart';
 
 class RecordingScreen extends StatelessWidget {
@@ -149,8 +150,8 @@ class TranscriptionWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               isRecording
-                  ? 'Listening... Speak now'
-                  : 'Tap the mic to start transcribing',
+                  ? AppStrings.recorderListening
+                  : AppStrings.recorderTapToStart,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.textInactive,
