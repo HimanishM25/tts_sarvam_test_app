@@ -26,7 +26,8 @@ class SpeechToTextResponse {
       requestId: data['request_id'] as String? ?? '',
       transcript: data['transcript'] as String? ?? '',
       audioDuration: (metrics['audio_duration'] as num?)?.toDouble() ?? 0.0,
-      processingLatency: (metrics['processing_latency'] as num?)?.toDouble() ?? 0.0,
+      processingLatency:
+          (metrics['processing_latency'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -42,13 +43,15 @@ class SocketClient {
 
   /// Exposes a stream of parsed responses from the WebSocket server.
   Stream<SpeechToTextResponse>? get responseStream {
-    return _channel?.stream.map((event) {
-      debugPrint('[SocketClient] Received event: $event');
-      final Map<String, dynamic> decoded = jsonDecode(event as String);
-      return SpeechToTextResponse.fromJson(decoded);
-    }).handleError((error) {
-      debugPrint('[SocketClient] Stream error occurred: $error');
-    });
+    return _channel?.stream
+        .map((event) {
+          debugPrint('[SocketClient] Received event: $event');
+          final Map<String, dynamic> decoded = jsonDecode(event as String);
+          return SpeechToTextResponse.fromJson(decoded);
+        })
+        .handleError((error) {
+          debugPrint('[SocketClient] Stream error occurred: $error');
+        });
   }
 
   /// Connects to the Sarvam AI Speech-to-Text WebSocket endpoint.
@@ -58,7 +61,9 @@ class SocketClient {
       return;
     }
 
-    final url = Uri.parse('wss://api.sarvam.ai/speech-to-text/ws?language-code=$languageCode');
+    final url = Uri.parse(
+      'wss://api.sarvam.ai/speech-to-text/ws?language-code=unknown',
+    );
     debugPrint('[SocketClient] Connecting to: $url');
 
     try {
@@ -84,7 +89,11 @@ class SocketClient {
   }
 
   /// Sends a chunk of audio bytes to the WebSocket server.
-  void sendAudioChunk(List<int> bytes, {int sampleRate = 16000, String encoding = 'audio/wav'}) {
+  void sendAudioChunk(
+    List<int> bytes, {
+    int sampleRate = 16000,
+    String encoding = 'audio/wav',
+  }) {
     if (!_isConnected || _channel == null) {
       debugPrint('[SocketClient] Send error: Socket is not connected.');
       throw StateError('Cannot send audio. Socket is not connected.');
@@ -96,7 +105,7 @@ class SocketClient {
         'data': base64Audio,
         'sample_rate': sampleRate.toString(),
         'encoding': encoding,
-      }
+      },
     };
 
     debugPrint('[SocketClient] Sending audio chunk (${bytes.length} bytes).');
@@ -106,7 +115,9 @@ class SocketClient {
   /// Closes the connection and cleans up resources.
   Future<void> disconnect() async {
     if (!_isConnected) {
-      debugPrint('[SocketClient] Disconnect requested, but already disconnected.');
+      debugPrint(
+        '[SocketClient] Disconnect requested, but already disconnected.',
+      );
       return;
     }
     debugPrint('[SocketClient] Disconnecting and closing sink.');
