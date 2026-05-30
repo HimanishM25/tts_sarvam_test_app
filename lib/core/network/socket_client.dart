@@ -55,7 +55,7 @@ class SocketClient {
   }
 
   /// Connects to the Sarvam AI Speech-to-Text WebSocket endpoint.
-  Future<void> connect({required String languageCode}) async {
+  Future<void> connect() async {
     if (_isConnected) {
       debugPrint('[SocketClient] Connection requested, but already connected.');
       return;

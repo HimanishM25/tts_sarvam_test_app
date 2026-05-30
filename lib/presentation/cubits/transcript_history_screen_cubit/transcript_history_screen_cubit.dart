@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tts_sarvam_test_app/domain/entities/transcript_entity.dart';
 import 'package:tts_sarvam_test_app/domain/usecase/transcription_history_usecase.dart';
 
-part 'transcript_history_screen_cubit_state.dart';
+part 'transcript_history_screen_state.dart';
 
 class TranscriptHistoryScreenCubit extends Cubit<TranscriptHistoryScreenState> {
   final TranscriptionHistoryUseCase transcriptionHistoryUseCase;

@@ -1,4 +1,4 @@
-part of 'transcript_history_screen_cubit_cubit.dart';
+part of 'transcript_history_screen_cubit.dart';
 
 sealed class TranscriptHistoryScreenState {}
 

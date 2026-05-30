@@ -21,11 +21,11 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
   RecorderScreenCubit({this.socketClient, required this.saveTranscriptionUseCase})
       : super(RecorderScreenInitial());
 
-  void toggleRecording({String languageCode = 'en-IN'}) {
+  void toggleRecording() {
     if (state.isRecording) {
       stopRecording(hasHistory: true);
     } else {
-      startRecording(languageCode: languageCode);
+      startRecording();
     }
   }
 
@@ -34,16 +34,14 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     if (list.isNotEmpty) {
       await saveTranscriptionUseCase(list);
     }
-    await stopRecording(hasHistory: false);
-    emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
+    await stopRecording(hasHistory: false, clearTranscripts: true);
   }
 
   Future<void> discardRecording() async {
-    await stopRecording(hasHistory: false);
-    emit(RecorderScreenStopped(transcripts: const [], hasHistory: false));
+    await stopRecording(hasHistory: false, clearTranscripts: true);
   }
 
-  Future<void> startRecording({String languageCode = 'en-IN'}) async {
+  Future<void> startRecording() async {
     final status = await Permission.microphone.request();
     if (!status.isGranted) {
       debugPrint('[RecorderScreenCubit] Microphone permission denied.');
@@ -60,7 +58,7 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     final client = socketClient;
     if (client != null) {
       try {
-        await client.connect(languageCode: languageCode);
+        await client.connect();
         
         _socketSubscription = client.responseStream?.listen(
           (response) {
@@ -126,7 +124,7 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     });
   }
 
-  Future<void> stopRecording({bool hasHistory = false}) async {
+  Future<void> stopRecording({bool hasHistory = false, bool clearTranscripts = false}) async {
     _visualizerTimer?.cancel();
     _audioSubscription?.cancel();
     _socketSubscription?.cancel();
@@ -141,7 +139,7 @@ class RecorderScreenCubit extends Cubit<RecorderScreenState> {
     await socketClient?.disconnect();
 
     emit(RecorderScreenStopped(
-      transcripts: state.transcripts,
+      transcripts: clearTranscripts ? const [] : state.transcripts,
       hasHistory: hasHistory,
     ));
   }

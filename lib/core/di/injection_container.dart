@@ -8,7 +8,7 @@ import 'package:tts_sarvam_test_app/domain/repository/transcription_repository.d
 import 'package:tts_sarvam_test_app/domain/usecase/save_transcription_usecase.dart';
 import 'package:tts_sarvam_test_app/domain/usecase/transcription_history_usecase.dart';
 import 'package:tts_sarvam_test_app/presentation/cubits/recorder_screen_cubit/recorder_screen_cubit.dart';
-import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit_cubit.dart';
+import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -35,8 +35,12 @@ Future<void> init() async {
     () => TranscriptionHistoryUseCase(sl<TranscriptionRepository>()),
   );
 
+  const apiKey = String.fromEnvironment(
+    'SARVAM_API_KEY',
+    defaultValue: 'sk_y7ow09yd_lQsMm0ZrGD4lqpUdN5bRcV5o',
+  );
   sl.registerLazySingleton<SocketClient>(
-    () => SocketClient("sk_y7ow09yd_lQsMm0ZrGD4lqpUdN5bRcV5o"),
+    () => SocketClient(apiKey),
   );
 
   sl.registerFactory<RecorderScreenCubit>(

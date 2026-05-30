@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tts_sarvam_test_app/core/constants/app_colors.dart';
 import 'package:tts_sarvam_test_app/core/di/injection_container.dart';
-import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit_cubit.dart';
+import 'package:tts_sarvam_test_app/presentation/cubits/transcript_history_screen_cubit/transcript_history_screen_cubit.dart';
 
 class TranscriptionHistoryScreen extends StatelessWidget {
   const TranscriptionHistoryScreen({super.key});
