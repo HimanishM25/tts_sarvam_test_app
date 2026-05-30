@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tts_sarvam_test_app/core/network/socket_client.dart';
@@ -35,10 +38,14 @@ Future<void> init() async {
     () => TranscriptionHistoryUseCase(sl<TranscriptionRepository>()),
   );
 
-  const apiKey = String.fromEnvironment(
-    'SARVAM_API_KEY',
-    defaultValue: 'sk_y7ow09yd_lQsMm0ZrGD4lqpUdN5bRcV5o',
+  // Load API key from local secrets file (not committed to git).
+  // Copy lib/config/secrets/sarvam_api_key.json.example to
+  // lib/config/secrets/sarvam_api_key.json and fill in your key.
+  final apiKeyJson = await rootBundle.loadString(
+    'lib/config/secrets/sarvam_api_key.json',
   );
+  final String apiKey = jsonDecode(apiKeyJson) as String;
+
   sl.registerLazySingleton<SocketClient>(
     () => SocketClient(apiKey),
   );

@@ -44,5 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Secrets / Credentials
-/lib/config/secrets/
+# Secrets / Credentials — keep the actual key file local only
+/lib/config/secrets/sarvam_api_key.json
+
