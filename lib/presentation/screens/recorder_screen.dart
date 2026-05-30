@@ -19,9 +19,22 @@ class RecordingScreen extends StatelessWidget {
 
           return Scaffold(
             backgroundColor: AppColors.background,
+            appBar: AppBar(
+              title: Text(
+                AppStrings.homeAppBarTitle,
+                style: TextStyle(
+                  color: AppColors.textDark,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
+            ),
             body: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 16.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -41,9 +54,7 @@ class RecordingScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: AppColors.lightGrey,
-                          ),
+                          border: Border.all(color: AppColors.lightGrey),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.black.withAlpha(5),
@@ -71,7 +82,9 @@ class RecordingScreen extends StatelessWidget {
                         context.read<RecorderScreenCubit>().discardRecording();
                       },
                       onSave: () {
-                        context.read<RecorderScreenCubit>().saveTranscriptionHistory();
+                        context
+                            .read<RecorderScreenCubit>()
+                            .saveTranscriptionHistory();
                       },
                     ),
 
@@ -173,14 +186,13 @@ class TranscriptionWidget extends StatelessWidget {
         final isLast = index == transcripts.length - 1;
 
         return Container(
-          padding: isLast ? const EdgeInsets.symmetric(vertical: 8) : EdgeInsets.zero,
+          padding: isLast
+              ? const EdgeInsets.symmetric(vertical: 8)
+              : EdgeInsets.zero,
           decoration: isLast
               ? const BoxDecoration(
                   border: Border(
-                    left: BorderSide(
-                      color: AppColors.primary,
-                      width: 3,
-                    ),
+                    left: BorderSide(color: AppColors.primary, width: 3),
                   ),
                 )
               : null,
@@ -269,7 +281,8 @@ class AudioControlWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (isRecording ? AppColors.primary : AppColors.black).withAlpha(38),
+                    color: (isRecording ? AppColors.primary : AppColors.black)
+                        .withAlpha(38),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),

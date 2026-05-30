@@ -28,7 +28,9 @@ Future<void> init() async {
   );
 
   sl.registerSingleton<TranscriptionRepository>(
-    TranscriptionRepositoryImpl(localDataSource: sl<TranscriptionLocalDataSource>()),
+    TranscriptionRepositoryImpl(
+      localDataSource: sl<TranscriptionLocalDataSource>(),
+    ),
   );
 
   sl.registerLazySingleton<SaveTranscriptionUseCase>(
@@ -38,17 +40,12 @@ Future<void> init() async {
     () => TranscriptionHistoryUseCase(sl<TranscriptionRepository>()),
   );
 
-  // Load API key from local secrets file (not committed to git).
-  // Copy lib/config/secrets/sarvam_api_key.json.example to
-  // lib/config/secrets/sarvam_api_key.json and fill in your key.
   final apiKeyJson = await rootBundle.loadString(
     'lib/config/secrets/sarvam_api_key.json',
   );
   final String apiKey = jsonDecode(apiKeyJson) as String;
 
-  sl.registerLazySingleton<SocketClient>(
-    () => SocketClient(apiKey),
-  );
+  sl.registerLazySingleton<SocketClient>(() => SocketClient(apiKey));
 
   sl.registerFactory<RecorderScreenCubit>(
     () => RecorderScreenCubit(

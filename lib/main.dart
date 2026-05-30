@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tts_sarvam_test_app/core/constants/app_colors.dart';
 import 'package:tts_sarvam_test_app/core/di/injection_container.dart' as di;
 import 'package:tts_sarvam_test_app/presentation/routes/app_router.dart';
 
@@ -17,6 +18,11 @@ class MainApp extends StatelessWidget {
       routerConfig: goRouter,
       theme: ThemeData(
         useMaterial3: true,
+        primaryColor: AppColors.primary,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+        ),
       ),
     );
   }
